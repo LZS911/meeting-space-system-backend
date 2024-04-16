@@ -1,0 +1,74 @@
+version: '3.9'
+services:
+  frontend:
+    image: gplane/pnpm:8.15-node20
+    container_name: frontend
+    user: root
+    privileged: true
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    restart: always
+    env_file: .env
+    command: /bin/bash -c "pnpm install -r && cd packages/frontend && pnpm start"
+    ports:
+      - '${FRONTEND_PORT}:7879'
+    volumes:
+      - .:/app
+    networks:
+      bp-network:
+        ipv4_address: 172.25.0.3
+    environment:
+      TZ: Asia/Shanghai
+  backend:
+    image: gplane/pnpm:8.15-node20
+    container_name: backend
+    user: root
+    privileged: true
+    stdin_open: true
+    tty: true
+    working_dir: /app
+    restart: always
+    env_file: .env
+    command: /bin/bash -c "pnpm install -r && cd packages/backend && pnpm migrate:mysql:dev && pnpm prisma:gen && pnpm start:debug"
+    volumes:
+      - .:/app
+    networks:
+      bp-network:
+        ipv4_address: 172.25.0.2
+    ports:
+      - '${BACKEND_PORT}:3535'
+      - 9229:9229
+    depends_on:
+      - mysql
+    environment:
+      TZ: Asia/Shanghai
+  mysql:
+    image: mysql:8.3.0
+    restart: always
+    container_name: meeting-mysql-db
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/mysql
+      MYSQL_DATABASE: ${DB_NAME}
+      TZ: Asia/Shanghai
+    privileged: true           
+    working_dir: /opt  
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d           
+    networks:
+      bp-network:
+        ipv4_address: 172.25.0.5
+volumes:
+  mysql_data:
+networks:
+  bp-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
