@@ -7,9 +7,14 @@ import { APP_GUARD } from '@nestjs/core';
 import { RoleAuthGuard } from './core/guard/auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import envConfig from './config/env';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'frontend', 'dist'),
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [envConfig.path],

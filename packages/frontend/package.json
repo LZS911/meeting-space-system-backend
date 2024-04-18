@@ -9,8 +9,7 @@
   },
   "scripts": {
     "start": "vite --port=7879 --host=0.0.0.0",
-    "build": "rm -rf dist && tsc && vite build",
-    "run:docker": "docker run -p 7880:7879 react-docker",
+    "build": "rm -rf dist && tsc --noEmit && vite build",
     "preview": "vite preview",
     "stylelint": "stylelint \"./src\"",
     "cspell": "cspell \"src/**/{*.ts,*.tsx,*.js,*.jsx}\"",
