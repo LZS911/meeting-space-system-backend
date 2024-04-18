@@ -51,7 +51,6 @@ services:
       - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      PGDATA: /var/lib/mysql
       MYSQL_DATABASE: ${DB_NAME}
       TZ: Asia/Shanghai
     privileged: true           
